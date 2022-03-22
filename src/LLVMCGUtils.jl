@@ -1,4 +1,4 @@
-module JuliaCGUtils
+module LLVMCGUtils
 
 using LLVM
 

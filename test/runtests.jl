@@ -1,7 +1,7 @@
-using JuliaCGUtils
+using LLVMCGUtils
 using Test
 using LLVM, InteractiveUtils
-using JuliaCGUtils: emit_pointer_from_objref, decay_derived
+using LLVMCGUtils: emit_pointer_from_objref, decay_derived
 
 @generated function pointer_from_objref_reimpl(x)
     Context() do ctx
