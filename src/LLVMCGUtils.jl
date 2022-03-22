@@ -2,6 +2,8 @@ module LLVMCGUtils
 
 using LLVM
 
+include("misc.jl")
+
 # AddressSpace
 const GENERIC = 0
 const TRACKED = 10

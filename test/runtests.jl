@@ -26,12 +26,14 @@ end
     x = Ref{Int}(1)
     @test pointer_from_objref_reimpl(x) == pointer_from_objref(x)
     @test pointer_from_objref_reimpl(x) == Base.unsafe_convert(Ptr{Cvoid}, x)
-    @info "Printing verbose IR code:"
-    @code_llvm raw=true optimize=true pointer_from_objref_reimpl(x)
-    @code_llvm raw=true optimize=true pointer_from_objref(x)
+    if haskey(ENV, "CI")
+        @info "Printing verbose IR code:"
+        @code_llvm raw=true optimize=true pointer_from_objref_reimpl(x)
+        @code_llvm raw=true optimize=true pointer_from_objref(x)
+    end
 end
 
-@generated run_global_ctors(mod) = LLVM.Interop.call_function(collect_global_ctors(mod), Cvoid)
+run_global_ctors(mod) = LLVM.Interop.call_function(collect_global_ctors(mod), Cvoid)
 
 # from LLJITDumpObjects.cpp
 IR = raw"""
@@ -61,7 +63,8 @@ ret void
 
 @testset "collect_global_ctors" begin
     Context() do ctx
-        m = parse(LLVM.Module, IR)
-        @test_nothrow run_global_ctors(m)
+        m = parse(LLVM.Module, IR; ctx)
+        @test_nowarn run_global_ctors(m)
+        haskey(ENV, "CI") && @code_llvm run_global_ctors(m)
     end
 end
